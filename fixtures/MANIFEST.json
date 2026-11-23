@@ -1,0 +1,41 @@
+{
+  "schema_version": "1",
+  "generated_on": "2026-11-23",
+  "generator": "scripts/generate_fixtures.py",
+  "seed": 20241123,
+  "seed_note": "The seed drives Gaussian noise on the noisy trial only. The noiseless trial is the closed form and does not use the seed.",
+  "equation": "C_next = C_ss + (C - C_ss) * exp(-(a + k_dep + k_filt) * dt), C_ss = (P * a * C_out) / (a + k_dep + k_filt)",
+  "license": "CC0-1.0. These traces were generated for SmokeRoom. They are not measurements from a monitoring network.",
+  "source_urls": [],
+  "attribution": "Original synthetic data. The mass-balance form is the standard well-mixed single-zone balance documented in docs/overlap.md. No third-party series is copied.",
+  "files": [
+    {
+      "path": "fixtures/noiseless/measurements.csv",
+      "sha256": "ab6cf682e385ed9e4be419c5d553e15c749021d43114592a33e6e6c60efdd176"
+    },
+    {
+      "path": "fixtures/noiseless/config.json",
+      "sha256": "d5cce911980325c248d01a3a1760fad3b6576acd55a8b94dd9547a128c6578ff"
+    },
+    {
+      "path": "fixtures/noisy/measurements.csv",
+      "sha256": "e0929df8ce8171ac13d9536cfd695b42c3fab62912278adbfb1f807a341060e8"
+    },
+    {
+      "path": "fixtures/noisy/config.json",
+      "sha256": "2bb1f3d3d246679780b18b2ec17de2f087aaa5c0708d7d71dea050528ddf7e02"
+    },
+    {
+      "path": "fixtures/invalid/negative_indoor.csv",
+      "sha256": "5fb5cfb8539798d17be1f7eb8e42c23b1764da07a340f7b9443c27bebbc1b149"
+    },
+    {
+      "path": "fixtures/invalid/config.json",
+      "sha256": "63da81cd8324385687c9784729e6ee9f7d1b29e4600b4a6b569532df8186ebe4"
+    },
+    {
+      "path": "fixtures/oracle/noiseless_steps.json",
+      "sha256": "a8d3a1611d32d805cad59dc953087df55d43533bce5adc8c5c987df24b45014c"
+    }
+  ]
+}

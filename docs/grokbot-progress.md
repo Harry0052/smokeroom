@@ -2,6 +2,90 @@
 
 ## Phase and status
 
+P03 — Build the working core — **PASS**
+
+## Files changed
+
+- `src/smokeroom/analysis.py`
+- `src/smokeroom/validate.py`
+- `src/smokeroom/cli.py`
+- `tests/test_run.py`
+- `docs/schema.md`
+- `README.md`
+- `docs/grokbot-progress.md`
+
+## Commands and results
+
+- `.venv/bin/pytest`: 10 passed.
+- `.venv/bin/python -m smokeroom run --measurements fixtures/noiseless/measurements.csv --config fixtures/noiseless/config.json --output outputs/noiseless` exited 0. Fit status `fitted`. Penetration 0.8 and deposition 0.2 1/h. Held-out MAE `2.90582e-13` µg/m³, bias `1.83409e-13` µg/m³, usable fraction 1 (3 of 3). Conclusion `supported`.
+- The same command on `fixtures/noisy` exited 0. Row 3 is `missing_observation`. Row 7 evaluation residual is `29.9399` µg/m³. Held-out MAE `15.011`, bias `15.011`, usable fraction `0.666667` (2 of 3). Conclusion `weak`. Fitted parameters do not change when only that held-out indoor value is replaced.
+- The negative fixture exits 2 with `negative_concentration` and writes no result file.
+
+## Artifact paths
+
+- `outputs/noiseless/result.json`
+- `outputs/noiseless/summary.txt`
+- `outputs/noisy/result.json`
+- `outputs/noisy/summary.txt`
+
+`outputs/` is gitignored. `pytest` rebuilds the same assertions in a temporary directory.
+
+## Open issues
+
+- The user-facing HTML report and save/load inspection path are P04.
+- Noisy calibration uses two eligible rows for two parameters, so those two calibration residuals are driven to about 0. That is expected for this fixture, and the held-out spike is not used.
+
+## Next phase
+
+P04 — Ship the user workflow and reports.
+
+## Phase and status
+
+P02 — Create the repository and data contracts — **PASS**
+
+## Files changed
+
+- `pyproject.toml`
+- `.gitignore`
+- `README.md`
+- `src/smokeroom/`
+- `tests/test_validate.py`
+- `scripts/generate_fixtures.py`
+- `fixtures/`
+- `docs/schema.md`
+- `docs/grokbot-progress.md`
+
+## Commands and results
+
+- `python3 scripts/generate_fixtures.py` wrote the noiseless, noisy, invalid, and oracle files. Noiseless indoor value at 01:00 is `25.616722965469` µg/m³.
+- `python3 -m venv .venv` required the `python3.12-venv` package, which was installed from Ubuntu archives. `.venv/bin/pip install -e ".[dev]"` installed NumPy 1.26.4, SciPy 1.14.1, and pytest 8.3.4.
+- `.venv/bin/python -m smokeroom validate --measurements fixtures/noiseless/measurements.csv --config fixtures/noiseless/config.json` exited 0. Summary status `accepted`, 7 rows, no flags.
+- The same command on `fixtures/invalid/negative_indoor.csv` exited 2. Standard error: `negative_concentration: row 2 indoor_pm25_ug_m3 is -1.5 ug/m3; concentrations must be >= 0`.
+- The noisy trial exited 0 with flags `absent_sensor`, `timezone_offset`, `channel_disagree`, and `duplicate_timestamp`.
+- `.venv/bin/pytest`: 6 passed before the P03 tests were added.
+
+## Artifact paths
+
+- `fixtures/noiseless/measurements.csv`
+- `fixtures/noiseless/config.json`
+- `fixtures/noisy/measurements.csv`
+- `fixtures/noisy/config.json`
+- `fixtures/invalid/negative_indoor.csv`
+- `fixtures/invalid/config.json`
+- `fixtures/oracle/noiseless.md`
+- `fixtures/oracle/noiseless_steps.json`
+- `fixtures/MANIFEST.json`
+
+## Open issues
+
+- None from P02. The solver was only a single tested step until P03.
+
+## Next phase
+
+P03 — Build the working core.
+
+## Phase and status
+
 P01 — Research overlap and confirm the MVP — **PASS**
 
 ## Files changed
