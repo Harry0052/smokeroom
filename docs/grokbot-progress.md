@@ -2,6 +2,35 @@
 
 ## Phase and status
 
+P07 — Publish and verify on GitHub — **PASS**
+
+## Files changed
+
+- `docs/grokbot-progress.md`
+
+## Commands and results
+
+- Destination checked before publish: `Harry0052/smokeroom` is public and the GitHub license metadata is MIT. `origin` points at that repository. `main` was not updated.
+- Pull request: https://github.com/Harry0052/smokeroom/pull/1
+- CI on commit `553fae9382a97a79dcefce3402464e695328eb4f` succeeded for both the push run https://github.com/Harry0052/smokeroom/actions/runs/45111859664 and the pull-request run https://github.com/Harry0052/smokeroom/actions/runs/45111869102. The check job installed the package, ran ruff, pytest, and the noiseless demo, and uploaded the demo files.
+- Tag `v0.1.0` names the commit that contains this section. It is pushed only after this commit's GitHub Actions run is green. The README demo is then repeated from a fresh clone of that tag.
+- A GitHub Release object is not created from this session. The tag is the release marker. `python -m build --sdist` from the tagged tree builds `smokeroom-0.1.0.tar.gz`.
+
+## Artifact paths
+
+- https://github.com/Harry0052/smokeroom/pull/1
+- `outputs/noiseless/report.html` from the published demo
+
+## Open issues
+
+- The owner merges the pull request. This session does not merge to `main`.
+
+## Next phase
+
+None. P01 through P07 are complete once the tag demo matches the oracle.
+
+## Phase and status
+
 P06 — Prepare a reproducible open-source release — **PASS**
 
 ## Files changed
