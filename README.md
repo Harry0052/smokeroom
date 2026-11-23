@@ -7,31 +7,46 @@ leave.
 
 ## Prerequisites
 
-- Python 3.11 or newer
-- The pinned packages in `pyproject.toml`: NumPy 1.26.4 and SciPy 1.14.1
-- pytest 9.2.0 and ruff 0.8.6 for the test and lint run
+Verified on Ubuntu with CPython 3.12. The same commands are the supported
+path for CPython 3.11 or newer. Windows virtual environments use
+`.venv\Scripts\` instead of `.venv/bin/`. No other platform is part of the
+recorded check.
 
-No data are downloaded at run time.
+Pinned runtime packages, from `pyproject.toml`:
 
-## Install and check a fixture
+- NumPy 1.26.4
+- SciPy 1.14.1
+
+Development checks also install pytest 9.2.0 and ruff 0.8.6. No data are
+downloaded at run time. There is no separate hardware, live-sensor, or
+real-monitoring demo.
+
+## Install
 
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -e ".[dev]"
-.venv/bin/python -m smokeroom validate \
-  --measurements fixtures/noiseless/measurements.csv \
-  --config fixtures/noiseless/config.json
 .venv/bin/ruff check src tests scripts
 .venv/bin/pytest
 ```
 
-Compare the bundled noiseless trial, then open the report:
+## Demo
+
+After that install, one command runs the noiseless fixture:
 
 ```bash
 .venv/bin/python -m smokeroom run \
   --measurements fixtures/noiseless/measurements.csv \
   --config fixtures/noiseless/config.json \
   --output outputs/noiseless
+```
+
+Expected result: fitted penetration `0.8`, deposition `0.2` 1/h, held-out
+usable fraction `1` (3 of 3), and held-out MAE and bias within `1e-6` µg/m³
+of zero. The report is `outputs/noiseless/report.html`. The machine-readable
+copy is `outputs/noiseless/result.json`. Reload that file with:
+
+```bash
 .venv/bin/python -m smokeroom show outputs/noiseless/result.json
 ```
 
@@ -63,6 +78,19 @@ The negative indoor fixture is the labeled invalid example:
 Input and output shapes are in `docs/schema.md`. The closed-form reference
 for the noiseless trial is in `fixtures/oracle/noiseless.md`. Generation
 notes, the seed, and file checksums are in `fixtures/MANIFEST.json`.
+
+## Fixture terms
+
+The CSV and JSON trials in `fixtures/` are original synthetic series released
+under CC0-1.0. They are not observations from a monitoring network. The noisy
+trial uses random seed `20241123` only for its Gaussian noise. Real series
+are out of scope until calibration, redistribution permission, collection
+dates, and station metadata are recorded.
+
+## License and changes
+
+The program is MIT. See `LICENSE`, `CHANGELOG.md`, `CONTRIBUTING.md`, and
+`SECURITY.md`. Version 0.1.0 is the first release candidate.
 
 ## Scope
 

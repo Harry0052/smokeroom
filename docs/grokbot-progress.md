@@ -2,6 +2,41 @@
 
 ## Phase and status
 
+P06 — Prepare a reproducible open-source release — **PASS**
+
+## Files changed
+
+- `README.md`
+- `CHANGELOG.md`
+- `CONTRIBUTING.md`
+- `SECURITY.md`
+- `MANIFEST.in`
+- `.github/workflows/ci.yml`
+- `docs/grokbot-progress.md`
+
+## Commands and results
+
+- Fresh copy in `/tmp/smokeroom-clean`, then the README install: `python3 -m venv .venv` and `.venv/bin/pip install -e ".[dev]"`. ruff check passed. pytest: 23 passed.
+- README demo on that copy: predictions matched `fixtures/oracle/noiseless_steps.json` within `1e-6` absolute and relative. Penetration `0.8`, deposition `0.2` 1/h, held-out usable fraction `1`, MAE and bias within `1e-6` µg/m³. Report contains `0.0000`.
+- `python -m build --sdist` produced `dist/smokeroom-0.1.0.tar.gz` with the library, tests, fixtures, license, and security notes. It does not contain `.venv` or `outputs/`. Installing that sdist and running `python -m smokeroom --help` succeeded.
+- Tracked-file scan found no private keys, cloud access-key patterns, or password assignments. Tracked files are text.
+- GitHub Actions workflow uses `contents: read`, pinned action SHAs, no secrets, and uploads the noiseless demo files. Hosted CI is checked in P07.
+
+## Artifact paths
+
+- `.github/workflows/ci.yml`
+- `dist/smokeroom-0.1.0.tar.gz` (build output, gitignored)
+
+## Open issues
+
+- Hosted CI has not run yet.
+
+## Next phase
+
+P07 — Publish and verify on GitHub.
+
+## Phase and status
+
 P05 — Verify correctness, security, and performance — **PASS**
 
 ## Files changed
