@@ -124,11 +124,7 @@ def _fit(loaded: dict) -> dict:
 
 def _predictable(rows: list[dict], loaded: dict, parameters: dict) -> list[dict]:
     timeline = _timeline(loaded, parameters)
-    return [
-        row
-        for row in rows
-        if timeline[row["utc"]]["predicted_ug_m3"] is not None
-    ]
+    return [row for row in rows if timeline[row["utc"]]["predicted_ug_m3"] is not None]
 
 
 def _calibration_targets(loaded: dict) -> list[dict]:
@@ -136,9 +132,7 @@ def _calibration_targets(loaded: dict) -> list[dict]:
     return [
         row
         for row in loaded["rows"]
-        if row["segment"] == "calibration"
-        and row["utc"] != earliest
-        and _eligible(row)
+        if row["segment"] == "calibration" and row["utc"] != earliest and _eligible(row)
     ]
 
 
@@ -151,7 +145,9 @@ def _eligible(row: dict) -> bool:
     )
 
 
-def _residuals(loaded: dict, names: list[str], vector: np.ndarray, targets: list[dict]) -> np.ndarray:
+def _residuals(
+    loaded: dict, names: list[str], vector: np.ndarray, targets: list[dict]
+) -> np.ndarray:
     parameters = dict(loaded["config"]["parameters"])
     parameters.update(zip(names, (float(value) for value in vector)))
     timeline = _timeline(loaded, parameters)
@@ -175,7 +171,9 @@ def _alternatives(
     found = []
     grid = [np.linspace(low, high, 7) for low, high in zip(lower, upper)]
     for point in np.ndindex(tuple(len(axis) for axis in grid)):
-        vector = np.array([axis[index] for axis, index in zip(grid, point)], dtype=float)
+        vector = np.array(
+            [axis[index] for axis, index in zip(grid, point)], dtype=float
+        )
         distance = float(np.linalg.norm((vector - best) / widths))
         if distance <= DISTINCT_PARAMETER_DISTANCE:
             continue
@@ -189,7 +187,9 @@ def _alternatives(
                     "objective_sse": sse,
                 }
             )
-    found.sort(key=lambda item: (item["objective_sse"], _parameter_key(item["parameters"])))
+    found.sort(
+        key=lambda item: (item["objective_sse"], _parameter_key(item["parameters"]))
+    )
     return found[:5]
 
 
@@ -208,7 +208,10 @@ def _timeline(loaded: dict, parameters: dict) -> dict[datetime, dict]:
     blocked_after = False
     for index, instant in enumerate(times):
         if blocked_after:
-            state[instant] = {"predicted_ug_m3": None, "prediction_state": "unavailable_input"}
+            state[instant] = {
+                "predicted_ug_m3": None,
+                "prediction_state": "unavailable_input",
+            }
             continue
         state[instant] = {"predicted_ug_m3": concentration, "prediction_state": "ok"}
         if index == len(times) - 1:
@@ -233,7 +236,11 @@ def _timeline(loaded: dict, parameters: dict) -> dict[datetime, dict]:
 
 def _filtration(config: dict, instant: datetime) -> float:
     for interval in config["filtration_schedule"]:
-        if interval["start"].astimezone(timezone.utc) <= instant < interval["end"].astimezone(timezone.utc):
+        if (
+            interval["start"].astimezone(timezone.utc)
+            <= instant
+            < interval["end"].astimezone(timezone.utc)
+        ):
             return interval["filtration_per_h"]
     raise RuntimeError(f"no filtration interval contains {instant.isoformat()}")
 
@@ -247,7 +254,9 @@ def _result_row(row: dict, timeline: dict[datetime, dict]) -> dict:
         residual = None
     elif duplicate:
         prediction_state = "duplicate"
-        residual = None if row["indoor_ug_m3"] is None else row["indoor_ug_m3"] - predicted
+        residual = (
+            None if row["indoor_ug_m3"] is None else row["indoor_ug_m3"] - predicted
+        )
     elif row["indoor_ug_m3"] is None:
         prediction_state = "missing_observation"
         residual = None

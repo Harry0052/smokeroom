@@ -232,7 +232,9 @@ def _schedule(value: object, bounds: dict) -> list[dict]:
                 "invalid_parameter",
                 f"filtration_schedule[{index}] must be an object",
             )
-        start = _parse_timestamp(item.get("start"), f"filtration_schedule[{index}].start")
+        start = _parse_timestamp(
+            item.get("start"), f"filtration_schedule[{index}].start"
+        )
         end = _parse_timestamp(item.get("end"), f"filtration_schedule[{index}].end")
         if end <= start:
             raise ContractError(
@@ -259,8 +261,7 @@ def _schedule(value: object, bounds: dict) -> list[dict]:
         if current["start"] < previous["end"]:
             raise ContractError(
                 "schedule_overlap",
-                "filtration intervals overlap at "
-                f"{_iso(current['start'])}",
+                "filtration intervals overlap at " f"{_iso(current['start'])}",
             )
         if current["start"] > previous["end"]:
             raise ContractError(

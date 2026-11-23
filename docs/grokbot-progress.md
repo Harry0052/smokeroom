@@ -2,6 +2,44 @@
 
 ## Phase and status
 
+P05 — Verify correctness, security, and performance — **PASS**
+
+## Files changed
+
+- `tests/test_acceptance.py`
+- `docs/validation.md`
+- `pyproject.toml`
+- `README.md`
+- `docs/grokbot-progress.md`
+- formatting updates from ruff in the Python sources
+
+## Commands and results
+
+- Host: Linux 6.12.113+ x86_64, CPython 3.12.3.
+- `.venv/bin/ruff check src tests scripts`: all checks passed.
+- `.venv/bin/ruff format --check src tests scripts`: passed after formatting.
+- `.venv/bin/python -m compileall -q src tests scripts`: success.
+- `.venv/bin/pytest`: 23 passed.
+- Fresh noiseless demo: 0.189 seconds. Diagnostic `conclusion=supported`, usable fraction 1.0000.
+- `pip-audit` 2.9.0 `--skip-editable` first reported PYSEC-2026-1845 (CVE-2025-71176) in pytest 8.3.4. The pin moved to pytest 9.2.0. A second audit reported no known vulnerabilities.
+- Fixture tree size: 8861 bytes. A 2,000-row evaluation on this host took 0.202 seconds, inside the 5 second budget.
+
+## Artifact paths
+
+- `docs/validation.md`
+- `outputs/noiseless/result.json` from the timed demo, gitignored
+
+## Open issues
+
+- Evidence is synthetic. A field dataset is not part of this release.
+- SciPy's wheel links LGPL `libquadmath`. The repository does not vendor it.
+
+## Next phase
+
+P06 — Prepare a reproducible open-source release.
+
+## Phase and status
+
 P04 — Ship the user workflow and reports — **PASS**
 
 ## Files changed

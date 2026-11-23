@@ -23,7 +23,9 @@ def main(argv: list[str] | None = None) -> int:
             "This comparison is not a room-safety rating."
         ),
     )
-    parser.add_argument("--version", action="version", version=f"smokeroom {__version__}")
+    parser.add_argument(
+        "--version", action="version", version=f"smokeroom {__version__}"
+    )
     sub = parser.add_subparsers(dest="command", required=True)
     validate = sub.add_parser(
         "validate",
@@ -95,10 +97,7 @@ def _summary_text(payload: dict, result_path: Path) -> str:
     ]
     for name, value in payload["parameters_used"].items():
         lines.append(f"  {name}: {value:.6g}")
-    lines.append(
-        "held-out MAE ug/m3: "
-        + _format_metric(metrics["mae_ug_m3"])
-    )
+    lines.append("held-out MAE ug/m3: " + _format_metric(metrics["mae_ug_m3"]))
     lines.append(
         "held-out bias ug/m3 (observed minus predicted): "
         + _format_metric(metrics["bias_ug_m3"])
@@ -148,7 +147,8 @@ def _configuration(loaded: dict) -> dict:
         "initial_indoor_ug_m3": config["initial_indoor_ug_m3"],
         "parameters": config["parameters"],
         "parameter_bounds": {
-            name: [low, high] for name, (low, high) in config["parameter_bounds"].items()
+            name: [low, high]
+            for name, (low, high) in config["parameter_bounds"].items()
         },
         "fit_parameters": config["fit_parameters"],
         "filtration_schedule": [

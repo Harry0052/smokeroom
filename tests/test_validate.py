@@ -35,10 +35,7 @@ def test_cli_accepts_noisy_fixture_with_traceable_flags() -> None:
     completed = _cli(NOISY / "measurements.csv", NOISY / "config.json")
     assert completed.returncode == 0, completed.stderr
     summary = json.loads(completed.stdout)
-    flags = {
-        item["timestamp"]: item["flags"]
-        for item in summary["row_flags"]
-    }
+    flags = {item["timestamp"]: item["flags"] for item in summary["row_flags"]}
     assert any("absent_sensor" in value for value in flags.values())
     assert any("timezone_offset" in value for value in flags.values())
     assert any("channel_disagree" in value for value in flags.values())
@@ -63,7 +60,9 @@ def test_naive_timestamp_is_rejected(tmp_path: Path) -> None:
         "2024-01-01T01:00:00,10,20,ok,ok\n",
         encoding="utf-8",
     )
-    config.write_text((INVALID / "config.json").read_text(encoding="utf-8"), encoding="utf-8")
+    config.write_text(
+        (INVALID / "config.json").read_text(encoding="utf-8"), encoding="utf-8"
+    )
     with pytest.raises(ContractError) as caught:
         validate_trial(measurements, config)
     assert caught.value.category == "timezone_naive"
@@ -81,7 +80,9 @@ def test_row_cap_rejects_oversized_input(tmp_path: Path) -> None:
 
 def test_noiseless_csv_matches_independent_closed_form() -> None:
     oracle = json.loads(
-        (ROOT / "fixtures" / "oracle" / "noiseless_steps.json").read_text(encoding="utf-8")
+        (ROOT / "fixtures" / "oracle" / "noiseless_steps.json").read_text(
+            encoding="utf-8"
+        )
     )
     indoors = [float(step["indoor_ug_m3"]) for step in oracle["steps"]]
     concentration = 40.0
@@ -99,7 +100,9 @@ def test_noiseless_csv_matches_independent_closed_form() -> None:
             0.2,
             filtration,
         ) == pytest.approx(indoors[hour + 1], abs=5e-10)
-    narrative = (ROOT / "fixtures" / "oracle" / "noiseless.md").read_text(encoding="utf-8")
+    narrative = (ROOT / "fixtures" / "oracle" / "noiseless.md").read_text(
+        encoding="utf-8"
+    )
     assert "25.616722965469" in narrative
 
 

@@ -94,7 +94,7 @@ def _table(rows: list[dict]) -> str:
             classes.append("large-residual")
         flags = ", ".join(row["flags"]) if row["flags"] else "none"
         body.append(
-            "<tr class=\"{klass}\">"
+            '<tr class="{klass}">'
             "<td>{row}</td><td>{stamp}</td><td>{segment}</td>"
             "<td>{indoor}</td><td>{outdoor}</td><td>{predicted}</td>"
             "<td>{residual}</td><td>{state}</td><td>{eligible}</td><td>{flags}</td>"
@@ -119,9 +119,7 @@ def _table(rows: list[dict]) -> str:
         "<th>Row</th><th>Timestamp</th><th>Segment</th>"
         "<th>Indoor ug/m3</th><th>Outdoor ug/m3</th><th>Predicted ug/m3</th>"
         "<th>Residual ug/m3</th><th>State</th><th>Eligible</th><th>Flags</th>"
-        "</tr></thead><tbody>"
-        + "".join(body)
-        + "</tbody></table></div>"
+        "</tr></thead><tbody>" + "".join(body) + "</tbody></table></div>"
     )
 
 
@@ -210,7 +208,9 @@ def _chart(rows: list[dict]) -> str:
     shapes = [
         f'<rect x="{left}" y="{top}" width="{width}" height="{height}" class="frame"></rect>'
     ]
-    holdout_times = [instant for instant, row in stamped if row["segment"] == "evaluation"]
+    holdout_times = [
+        instant for instant, row in stamped if row["segment"] == "evaluation"
+    ]
     if holdout_times:
         shapes.append(
             '<rect x="{x:.1f}" y="{y}" width="{w:.1f}" height="{h}" class="holdout"></rect>'.format(
@@ -237,7 +237,9 @@ def _chart(rows: list[dict]) -> str:
         and row["prediction_state"] != "unavailable_input"
     ]
     if len(predicted) >= 2:
-        points = " ".join(f"{x_of(instant):.1f},{y_of(value):.1f}" for instant, value in predicted)
+        points = " ".join(
+            f"{x_of(instant):.1f},{y_of(value):.1f}" for instant, value in predicted
+        )
         shapes.append(f'<polyline points="{points}" class="predicted"></polyline>')
     for instant, row in stamped:
         indoor = row["indoor_ug_m3"]
@@ -253,13 +255,13 @@ def _chart(rows: list[dict]) -> str:
         f'<text x="{left}" y="{top + height + 4}">{_esc(_stamp(stamped[0][1]))}</text>'
     )
     return (
-        '<figure>'
+        "<figure>"
         '<svg viewBox="0 0 800 310" role="img" aria-labelledby="chart-title chart-desc">'
         '<title id="chart-title">Observed and predicted indoor PM2.5</title>'
         '<desc id="chart-desc">Filled circles are eligible indoor observations. '
-        'Open circles are ineligible. The dashed line is the model. '
-        'Vertical hatching marks a missing or unsupported interval. '
-        'The shaded right side is the held-out segment.</desc>'
+        "Open circles are ineligible. The dashed line is the model. "
+        "Vertical hatching marks a missing or unsupported interval. "
+        "The shaded right side is the held-out segment.</desc>"
         + "".join(shapes)
         + axis
         + "</svg>"

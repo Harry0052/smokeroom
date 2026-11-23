@@ -22,14 +22,18 @@ INVALID = ROOT / "fixtures" / "invalid"
 def test_noiseless_run_matches_oracle(tmp_path: Path) -> None:
     result = _run(NOISELESS, tmp_path / "noiseless")
     oracle = json.loads(
-        (ROOT / "fixtures" / "oracle" / "noiseless_steps.json").read_text(encoding="utf-8")
+        (ROOT / "fixtures" / "oracle" / "noiseless_steps.json").read_text(
+            encoding="utf-8"
+        )
     )
     assert result["status"] == "complete"
     assert result["conclusion"] == "supported"
     assert result["fit"]["status"] == "fitted"
     assert result["parameters_used"]["penetration"] == pytest.approx(0.8, abs=1e-6)
     assert result["parameters_used"]["deposition_per_h"] == pytest.approx(0.2, abs=1e-6)
-    assert result["parameters_used"]["air_exchange_per_h"] == pytest.approx(0.5, abs=1e-12)
+    assert result["parameters_used"]["air_exchange_per_h"] == pytest.approx(
+        0.5, abs=1e-12
+    )
     indoors = [float(step["indoor_ug_m3"]) for step in oracle["steps"]]
     predicted = [row["predicted_ug_m3"] for row in result["rows"]]
     assert predicted == pytest.approx(indoors, abs=1e-6, rel=1e-6)
@@ -59,9 +63,11 @@ def test_noisy_run_marks_gap_and_spike_without_using_holdout(tmp_path: Path) -> 
     metrics = original["metrics"]["held_out"]
     assert metrics["n_rows"] == 3
     assert metrics["n_eligible"] == 2
-    assert {metrics["mae_ug_m3"], metrics["bias_ug_m3"], metrics["usable_fraction"]} <= set(
-        metrics.values()
-    )
+    assert {
+        metrics["mae_ug_m3"],
+        metrics["bias_ug_m3"],
+        metrics["usable_fraction"],
+    } <= set(metrics.values())
     assert original["conclusion"] == "weak"
 
     changed = tmp_path / "changed"
@@ -94,7 +100,9 @@ def test_missing_outdoor_stops_later_predictions(tmp_path: Path) -> None:
     rows[2]["outdoor_pm25_ug_m3"] = ""
     rows[2]["outdoor_quality"] = "missing"
     _write_rows(trial / "measurements.csv", rows)
-    result = evaluate_trial(load_trial(trial / "measurements.csv", trial / "config.json"))
+    result = evaluate_trial(
+        load_trial(trial / "measurements.csv", trial / "config.json")
+    )
     states = [row["prediction_state"] for row in result["rows"]]
     assert states[2] == "ok"
     assert states[3] == "unavailable_input"
@@ -136,7 +144,9 @@ def _write_rows(path: Path, rows: list[dict]) -> None:
         writer.writerows(rows)
 
 
-def _cli(measurements: Path, config: Path, output: Path) -> subprocess.CompletedProcess[str]:
+def _cli(
+    measurements: Path, config: Path, output: Path
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [
             sys.executable,

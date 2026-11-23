@@ -9,7 +9,7 @@ leave.
 
 - Python 3.11 or newer
 - The pinned packages in `pyproject.toml`: NumPy 1.26.4 and SciPy 1.14.1
-- pytest 8.3.4 for the test run
+- pytest 9.2.0 and ruff 0.8.6 for the test and lint run
 
 No data are downloaded at run time.
 
@@ -21,6 +21,7 @@ python3 -m venv .venv
 .venv/bin/python -m smokeroom validate \
   --measurements fixtures/noiseless/measurements.csv \
   --config fixtures/noiseless/config.json
+.venv/bin/ruff check src tests scripts
 .venv/bin/pytest
 ```
 
