@@ -24,19 +24,30 @@ python3 -m venv .venv
 .venv/bin/pytest
 ```
 
-Compare a trial and write `result.json` plus `summary.txt`:
+Compare the bundled noiseless trial, then open the report:
 
 ```bash
 .venv/bin/python -m smokeroom run \
   --measurements fixtures/noiseless/measurements.csv \
   --config fixtures/noiseless/config.json \
   --output outputs/noiseless
+.venv/bin/python -m smokeroom show outputs/noiseless/result.json
 ```
+
+`run` writes three files in the output directory:
+
+- `result.json` — configuration, parameter assumptions, row residuals, and held-out MAE, bias, and usable fraction
+- `summary.txt` — the same rows in a short text form
+- `report.html` — alignment, a timeline with gaps and the held-out window marked, and the residual table
+
+Standard output is the JSON result. A one-line `diagnostic:` note goes to standard error. `show` loads `result.json` and prints the text summary. `--help` lists the commands. Exit 0 means the command finished, and exit 2 means the input or saved file was rejected.
 
 On this noiseless trial the fitted penetration and deposition stay at the
 declared 0.8 and 0.2 1/h, and the predicted indoor series matches
 `fixtures/oracle/noiseless.md` within 1e-6 µg/m³. Held-out MAE and bias are
-about 0, and the usable fraction is 1.
+about 0, and the usable fraction is 1. The noisy trial is the partial case:
+it keeps a missing comparison and a large held-out residual, and the report
+labels that comparison weak.
 
 `validate` prints a JSON summary and exits 0 when the trial matches schema 1.
 A rejected trial prints `category: message` on standard error and exits 2.

@@ -11,6 +11,7 @@ from pathlib import Path
 from smokeroom import __version__
 from smokeroom.analysis import evaluate_trial
 from smokeroom.errors import ContractError
+from smokeroom.report import render_report
 from smokeroom.validate import load_trial, validate_trial
 
 
@@ -37,11 +38,17 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--measurements", required=True, type=Path)
     run.add_argument("--config", required=True, type=Path)
     run.add_argument("--output", required=True, type=Path)
+    show = sub.add_parser(
+        "show",
+        help="Load a saved result.json and print the human summary",
+    )
+    show.add_argument("result", type=Path)
     args = parser.parse_args(argv)
     try:
         if args.command == "validate":
             payload = validate_trial(args.measurements, args.config)
-        else:
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        elif args.command == "run":
             loaded = load_trial(args.measurements, args.config)
             payload = evaluate_trial(loaded)
             payload["inputs"] = {
@@ -50,11 +57,17 @@ def main(argv: list[str] | None = None) -> int:
                 "measurements_sha256": _sha256(args.measurements),
                 "config_sha256": _sha256(args.config),
             }
+            payload["configuration"] = _configuration(loaded)
             _write_run(args.output, payload)
+            print(json.dumps(payload, indent=2, sort_keys=True))
+            print(_diagnostic(payload), file=sys.stderr)
+        else:
+            payload = _load_saved(args.result)
+            print(_summary_text(payload, args.result))
+            print(_diagnostic(payload), file=sys.stderr)
     except ContractError as exc:
         print(f"{exc.category}: {exc.message}", file=sys.stderr)
         return 2
-    print(json.dumps(payload, indent=2, sort_keys=True))
     return 0
 
 
@@ -67,6 +80,7 @@ def _write_run(output: Path, payload: dict) -> None:
         encoding="utf-8",
     )
     summary_path.write_text(_summary_text(payload, result_path), encoding="utf-8")
+    (output / "report.html").write_text(render_report(payload), encoding="utf-8")
 
 
 def _summary_text(payload: dict, result_path: Path) -> str:
@@ -107,8 +121,64 @@ def _summary_text(payload: dict, result_path: Path) -> str:
         lines.append("weak evidence:")
         lines.extend(f"  - {reason}" for reason in payload["weak_reasons"])
     lines.append(f"machine-readable result: {result_path}")
+    html_path = result_path.with_name("report.html")
+    if html_path.is_file() or result_path.name == "result.json":
+        lines.append(f"html report: {html_path}")
     lines.append("")
     return "\n".join(lines)
+
+
+def _diagnostic(payload: dict) -> str:
+    metrics = payload["metrics"]["held_out"]
+    return (
+        "diagnostic: "
+        f"conclusion={payload['conclusion']} "
+        f"status={payload['status']} "
+        f"held_out_usable_fraction={metrics['usable_fraction']:.4f}"
+    )
+
+
+def _configuration(loaded: dict) -> dict:
+    config = loaded["config"]
+    return {
+        "schema_version": "1",
+        "trial_id": config["trial_id"],
+        "timezone": "UTC",
+        "room_volume_m3": config["room_volume_m3"],
+        "initial_indoor_ug_m3": config["initial_indoor_ug_m3"],
+        "parameters": config["parameters"],
+        "parameter_bounds": {
+            name: [low, high] for name, (low, high) in config["parameter_bounds"].items()
+        },
+        "fit_parameters": config["fit_parameters"],
+        "filtration_schedule": [
+            {
+                "start": item["start"].isoformat(),
+                "end": item["end"].isoformat(),
+                "filtration_per_h": item["filtration_per_h"],
+            }
+            for item in config["filtration_schedule"]
+        ],
+        "calibration_end": config["calibration_end"].isoformat(),
+    }
+
+
+def _load_saved(path: Path) -> dict:
+    if not path.is_file():
+        raise ContractError("invalid_result", f"saved result does not exist: {path}")
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ContractError(
+            "invalid_result",
+            f"saved result is not JSON ({exc.msg} at line {exc.lineno})",
+        ) from exc
+    if not isinstance(payload, dict) or payload.get("schema_version") != "1":
+        raise ContractError("invalid_result", "saved result schema_version must be '1'")
+    for key in ("trial_id", "rows", "metrics", "fit", "parameters_used", "conclusion"):
+        if key not in payload:
+            raise ContractError("invalid_result", f"saved result is missing {key}")
+    return payload
 
 
 def _format_metric(value: float | None) -> str:

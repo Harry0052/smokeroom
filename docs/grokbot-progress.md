@@ -2,6 +2,44 @@
 
 ## Phase and status
 
+P04 — Ship the user workflow and reports — **PASS**
+
+## Files changed
+
+- `src/smokeroom/report.py`
+- `src/smokeroom/cli.py`
+- `tests/test_report.py`
+- `README.md`
+- `.gitignore`
+- `docs/grokbot-progress.md`
+
+## Commands and results
+
+- `.venv/bin/pytest`: 14 passed.
+- `smokeroom run` on the noiseless fixture writes `result.json`, `summary.txt`, and `report.html`. Standard output is JSON. Standard error is `diagnostic: conclusion=supported status=complete held_out_usable_fraction=1.0000`.
+- `smokeroom show outputs/noiseless/result.json` prints the row summary, including residuals, and exits 0.
+- `smokeroom --help` exits 0 and lists `validate`, `run`, and `show`.
+- The negative fixture through `run` exits 2, writes no output directory, and the standard error starts with `negative_concentration:` and states the µg/m³ bound.
+- The noisy report includes `missing_observation`, residual `29.9399`, and the same eligible row numbers as `result.json`.
+- Browser check of `outputs/noisy/report.html` at 390×844: Tab focuses “Skip to findings”, Enter sets the URL hash to `#findings`, the status region reads the weak conclusion, the page does not scroll horizontally, and the table scrolls inside its wrapper. No console errors after the empty favicon. The noiseless report at desktop width shows held-out MAE `0.0000` µg/m³, usable fraction `1.0000` (3 of 3), and a chart with 7 observation marks and one prediction line.
+
+## Artifact paths
+
+- `outputs/noiseless/report.html`
+- `outputs/noiseless/result.json`
+- `outputs/noisy/report.html`
+- `outputs/noisy/result.json`
+
+## Open issues
+
+- None for the local HTML workflow. Hosted CI is later.
+
+## Next phase
+
+P05 — Verify correctness, security, and performance.
+
+## Phase and status
+
 P03 — Build the working core — **PASS**
 
 ## Files changed
