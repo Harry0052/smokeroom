@@ -1,0 +1,54 @@
+{
+  "schema_version": "1",
+  "trial_id": "noiseless",
+  "description": "Closed-form hourly trial. Filtration increases from 0 to 1.5 1/h at 03:00Z.",
+  "timezone": "UTC",
+  "room_volume_m3": 48.0,
+  "initial_indoor_ug_m3": 40.0,
+  "parameters": {
+    "penetration": 0.8,
+    "air_exchange_per_h": 0.5,
+    "deposition_per_h": 0.2
+  },
+  "parameter_bounds": {
+    "penetration": [
+      0.2,
+      1.0
+    ],
+    "air_exchange_per_h": [
+      0.1,
+      1.5
+    ],
+    "deposition_per_h": [
+      0.0,
+      1.0
+    ],
+    "filtration_per_h": [
+      0.0,
+      4.0
+    ]
+  },
+  "fit_parameters": [
+    "penetration",
+    "deposition_per_h"
+  ],
+  "filtration_schedule": [
+    {
+      "start": "2024-01-01T00:00:00+00:00",
+      "end": "2024-01-01T03:00:00+00:00",
+      "filtration_per_h": 0.0
+    },
+    {
+      "start": "2024-01-01T03:00:00+00:00",
+      "end": "2024-01-01T06:00:00+00:00",
+      "filtration_per_h": 1.5
+    }
+  ],
+  "calibration_end": "2024-01-01T04:00:00+00:00",
+  "limits": {
+    "max_rows": 10000,
+    "max_bytes": 2000000,
+    "min_concentration_ug_m3": 0.0,
+    "max_concentration_ug_m3": 1000.0
+  }
+}
